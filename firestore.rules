@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // User profile and subcollections rule
+    // Strict isolation: authenticated user can ONLY read and write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /semesters/{semesterId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        match /subjects/{subjectId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+
+        match /timetable/{timetableId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+
+        match /classes/{classId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+
+        match /attendance/{attendanceId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
